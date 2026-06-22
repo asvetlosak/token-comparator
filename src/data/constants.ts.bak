@@ -182,7 +182,7 @@ export const GPU_PROVIDERS: GPUProvider[] = [  {
     region: 'EU (Frankfurt eu-central-1, Ireland eu-west-1)',
     flag: '🇪🇺',
     // source: https://aws.amazon.com/ec2/pricing/on-demand/?nc2=type_a&nc1=h_ls#eu-central-1
-    // fetched_at: 2026-06-22T21:28:34Z
+    // fetched_at: 2026-06-22T21:23:27Z
     pricingUrl: 'https://aws.amazon.com/ec2/pricing/on-demand/?nc2=type_a&nc1=h_ls#eu-central-1',
     instances: [
       // p4de.24xlarge (8x A100 80GB) — 29.9330 EUR/hod
@@ -200,7 +200,7 @@ export const GPU_PROVIDERS: GPUProvider[] = [  {
     flag: '🇪🇺',
     // source: https://azure.microsoft.com/en-us/pricing/details/virtual-machines/linux/#nd-h100-v5-series
     // pricing_api: https://prices.azure.com/api/retail/prices
-    // fetched_at: 2026-06-22T21:28:36Z
+    // fetched_at: 2026-06-22T21:23:29Z
     pricingUrl: 'https://azure.microsoft.com/en-us/pricing/details/virtual-machines/linux/#nd-h100-v5-series',
     instances: [
       // ND96isr_H100_v5 (8x H100 SXM) (EU (West Europe)) — 115.4260 EUR/hod
@@ -213,7 +213,7 @@ export const GPU_PROVIDERS: GPUProvider[] = [  {
     region: 'EU (Finland eu-north1)',
     flag: '🇫🇮',
     // source: https://nebius.com/docs/compute/pricing/
-    // fetched_at: 2026-06-22T21:28:38Z
+    // fetched_at: 2026-06-22T21:23:30Z
     pricingUrl: 'https://nebius.com/docs/compute/pricing/',
     instances: [
       // 1x H100 SXM5 — 3.8500 EUR/hod
@@ -230,7 +230,7 @@ export const GPU_PROVIDERS: GPUProvider[] = [  {
     region: 'EU (France/Germany)',
     flag: '🇫🇷',
     // source: https://www.ovhcloud.com/en/public-cloud/prices/#397
-    // fetched_at: 2026-06-22T21:28:41Z
+    // fetched_at: 2026-06-22T21:23:33Z
     pricingUrl: 'https://www.ovhcloud.com/en/public-cloud/prices/#397',
     instances: [
       // 8x H100 SXM (OVH Public Cloud GRA) — 20.8973 EUR/hod
@@ -243,7 +243,7 @@ export const GPU_PROVIDERS: GPUProvider[] = [  {
     region: 'EU (France fr-par-2)',
     flag: '🇫🇷',
     // source: https://www.scaleway.com/en/pricing/gpu/?zone=fr-par-2
-    // fetched_at: 2026-06-22T21:28:42Z
+    // fetched_at: 2026-06-22T21:23:35Z
     pricingUrl: 'https://www.scaleway.com/en/pricing/gpu/?zone=fr-par-2',
     instances: [
       // 8x H100 SXM (Scaleway fr-par-2) — 25.3308 EUR/hod
@@ -256,17 +256,17 @@ export const GPU_PROVIDERS: GPUProvider[] = [  {
     region: 'Local',
     flag: '🏢',
     // source: https://smicro.sk/vyhladavanie?search=H100
-    // fetched_at: 2026-06-22T21:29:02Z
+    // fetched_at: 2026-06-22T21:23:57Z
     pricingUrl: 'https://smicro.sk/vyhladavanie?search=H100',
     instances: [
       // NVIDIA DGX H200 8x 141GB — 430,369 EUR nákupná cena
-      { id: 'smicro-dgx-h200', name: 'NVIDIA DGX H200 8x 141GB', gpuType: 'H200', gpuCount: 8, vramPerGPU: 141, pricePerHour: 0, pricePerMonth: 0, hardwareCostPerNode: 430368, itemUrl: 'https://smicro.sk/nvidia-dgx-h200-8x-141gb-5y-full-std-support-dgxh-g1128-p2cmi60-2' },
+      { id: 'smicro-dgx-h200', name: 'NVIDIA DGX H200 8x 141GB', gpuType: 'H200', gpuCount: 8, vramPerGPU: 141, pricePerHour: 0, pricePerMonth: 0, hardwareCostPerNode: 430368, itemUrl: 'https://smicro.sk#' },
       // NVIDIA DGX B200 8x 180GB — 395,222 EUR nákupná cena
-      { id: 'smicro-dgx-b200', name: 'NVIDIA DGX B200 8x 180GB', gpuType: 'H200', gpuCount: 8, vramPerGPU: 180, pricePerHour: 0, pricePerMonth: 0, hardwareCostPerNode: 395222, itemUrl: 'https://smicro.sk/nvidia-dgx-b200-8x-180gb-full-bussiness-std-dgxb-g1440-p2ini48-2' },
-      // Server 8x H100 80GB — 251,915 EUR nákupná cena
-      { id: 'smicro-hgx-h100', name: 'Server 8x H100 80GB', gpuType: 'H100', gpuCount: 8, vramPerGPU: 80, pricePerHour: 0, pricePerMonth: 0, hardwareCostPerNode: 251914, itemUrl: 'https://smicro.sk/nvidia-hgx-h100-640gb-935-24287-0001-000-2' },
+      { id: 'smicro-dgx-b200', name: 'NVIDIA DGX B200 8x 180GB', gpuType: 'H200', gpuCount: 8, vramPerGPU: 180, pricePerHour: 0, pricePerMonth: 0, hardwareCostPerNode: 395222, itemUrl: 'https://smicro.sk#' },
+      // Server 8x H100 80GB — 251,914 EUR nákupná cena
+      { id: 'smicro-hgx-h100', name: 'Server 8x H100 80GB', gpuType: 'H100', gpuCount: 8, vramPerGPU: 80, pricePerHour: 0, pricePerMonth: 0, hardwareCostPerNode: 251914 },
       // NVIDIA H100 80GB PCIe — 27,627 EUR nákupná cena
-      { id: 'smicro-h100-pcie', name: 'NVIDIA H100 80GB PCIe', gpuType: 'H100', gpuCount: 1, vramPerGPU: 80, pricePerHour: 0, pricePerMonth: 0, hardwareCostPerNode: 27626, itemUrl: 'https://smicro.sk/nvidia-h100-hopper-pcie-5-0-x16-80-gb-900-21010-0000-000-3' },
+      { id: 'smicro-h100-pcie', name: 'NVIDIA H100 80GB PCIe', gpuType: 'H100', gpuCount: 1, vramPerGPU: 80, pricePerHour: 0, pricePerMonth: 0, hardwareCostPerNode: 27626, itemUrl: 'https://smicro.sk#' },
     ],
   },
 ];
@@ -277,7 +277,7 @@ export const API_PROVIDERS: APIProvider[] = [  {
     region: 'EU (Finland eu-north1)',
     flag: '🇫🇮',
     // source: https://tokenfactory.nebius.com/models
-    // fetched_at: 2026-06-22T21:28:44Z
+    // fetched_at: 2026-06-22T21:23:37Z
     pricingUrl: 'https://tokenfactory.nebius.com/models',
     models: [
       // deepseek-v4 — in: 1.5276/M, out: 3.0552/M | parsované z private API (USD->EUR)
@@ -296,7 +296,7 @@ export const API_PROVIDERS: APIProvider[] = [  {
     region: 'EU (France/Netherlands)',
     flag: '🇪🇺',
     // source: https://www.scaleway.com/en/pricing/?tags=ai
-    // fetched_at: 2026-06-22T21:28:46Z
+    // fetched_at: 2026-06-22T21:23:38Z
     pricingUrl: 'https://www.scaleway.com/en/pricing/?tags=ai',
     models: [
       // deepseek-v4 — in: 0/M, out: 0/M | nedostupný na Scaleway
@@ -315,7 +315,7 @@ export const API_PROVIDERS: APIProvider[] = [  {
     region: 'EU (Netherlands)',
     flag: '🇳🇱',
     // source: https://docs.greenpt.ai/models
-    // fetched_at: 2026-06-22T21:28:57Z
+    // fetched_at: 2026-06-22T21:23:53Z
     pricingUrl: 'https://docs.greenpt.ai/models',
     models: [
       // deepseek-v4 — in: 0/M, out: 0/M | nedostupný na GreenPT
@@ -334,7 +334,7 @@ export const API_PROVIDERS: APIProvider[] = [  {
     region: 'EU (Sweden)',
     flag: '🇸🇪',
     // source: https://tensorx.ai/pricing/
-    // fetched_at: 2026-06-22T21:28:53Z
+    // fetched_at: 2026-06-22T21:23:49Z
     pricingUrl: 'https://tensorx.ai/pricing/',
     models: [
       // deepseek-v4 — in: 1.75/M, out: 0.44/M | parsovaná zo stránky
@@ -353,7 +353,7 @@ export const API_PROVIDERS: APIProvider[] = [  {
     region: 'EU (Frankfurt eu-central-1, Paris eu-west-3)',
     flag: '🇪🇺',
     // source: https://aws.amazon.com/bedrock/pricing/
-    // fetched_at: 2026-06-22T21:28:55Z
+    // fetched_at: 2026-06-22T21:23:51Z
     pricingUrl: 'https://aws.amazon.com/bedrock/pricing/',
     models: [
       // deepseek-v4 — in: 0/M, out: 0/M | nedostupný na AWS Bedrock EU
@@ -372,7 +372,7 @@ export const API_PROVIDERS: APIProvider[] = [  {
     region: 'EU (Sweden)',
     flag: '🇸🇪',
     // source: https://www.inceptron.io/models
-    // fetched_at: 2026-06-22T21:28:59Z
+    // fetched_at: 2026-06-22T21:23:54Z
     pricingUrl: 'https://www.inceptron.io/models',
     models: [
       // deepseek-v4 — in: 0/M, out: 0/M | nedostupný na Inceptron
@@ -387,19 +387,19 @@ export const API_PROVIDERS: APIProvider[] = [  {
   },
   // source: https://infercom.ai/pricing/ (manuálne — žiadne verejné API)
   {
-                    id: 'infercom-api',
-                    name: 'Infercom',
-                    region: 'EU (Luxembourg)',
-                    flag: '🇱🇺',
-                    // source: https://infercom.ai/pricing/ (manuálne — žiadne verejné API)
-                    pricingUrl: 'https://infercom.ai/pricing/',
-                    models: [
-                      { modelId: 'deepseek-v4', modelName: 'DeepSeek Pro v4', inputPricePerMillion: 0, outputPricePerMillion: 0, isAvailable: false },
-                      { modelId: 'glm-5.2', modelName: 'GLM 5.2', inputPricePerMillion: 0, outputPricePerMillion: 0, isAvailable: false },
-                      { modelId: 'minimax-m3', modelName: 'MiniMax M3', inputPricePerMillion: 0, outputPricePerMillion: 0, isAvailable: false },
-                      { modelId: 'qwen-3.6', modelName: 'Qwen 3.6', inputPricePerMillion: 0, outputPricePerMillion: 0, isAvailable: false },
-                    ],
-                  },
+                  id: 'infercom-api',
+                  name: 'Infercom',
+                  region: 'EU (Luxembourg)',
+                  flag: '🇱🇺',
+                  // source: https://infercom.ai/pricing/ (manuálne — žiadne verejné API)
+                  pricingUrl: 'https://infercom.ai/pricing/',
+                  models: [
+                    { modelId: 'deepseek-v4', modelName: 'DeepSeek Pro v4', inputPricePerMillion: 0, outputPricePerMillion: 0, isAvailable: false },
+                    { modelId: 'glm-5.2', modelName: 'GLM 5.2', inputPricePerMillion: 0, outputPricePerMillion: 0, isAvailable: false },
+                    { modelId: 'minimax-m3', modelName: 'MiniMax M3', inputPricePerMillion: 0, outputPricePerMillion: 0, isAvailable: false },
+                    { modelId: 'qwen-3.6', modelName: 'Qwen 3.6', inputPricePerMillion: 0, outputPricePerMillion: 0, isAvailable: false },
+                  ],
+                },
 ];
 
 export const DEFAULTS = {

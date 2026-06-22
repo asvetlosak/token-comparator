@@ -1,5 +1,5 @@
 import React from 'react';
-import { MODELS, GPU_PROVIDERS, API_PROVIDERS } from '../data/constants';
+import { MODELS, GPU_PROVIDERS, API_PROVIDERS, GPU_HARDWARE_SPECS } from '../data/constants';
 
 export default function CalculationDetails() {
   return (
@@ -25,12 +25,22 @@ export default function CalculationDetails() {
           <div className="px-6 pb-6 pt-2 border-t border-white/5 space-y-6">
             <div>
               <h4 className="text-sm font-semibold text-cyan-400 mb-3">API Providery (Cenníky)</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {API_PROVIDERS.map(p => (
-                  <a key={p.id} href={p.pricingUrl} target="_blank" rel="noreferrer" className="flex items-center justify-between p-3 rounded bg-slate-900 border border-slate-800 hover:border-cyan-500/50 transition-colors">
-                    <span className="text-sm text-slate-200">{p.flag} {p.name}</span>
-                    <span className="text-xs text-indigo-400">Otvoriť cenník ↗</span>
-                  </a>
+                  <div key={p.id} className="p-3 rounded bg-slate-900 border border-slate-800 flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-slate-200">{p.flag} {p.name}</span>
+                      <a href={p.pricingUrl} target="_blank" rel="noreferrer" className="text-xs text-indigo-400 hover:underline">Zdroj ↗</a>
+                    </div>
+                    <div className="space-y-1 mt-2 border-t border-slate-800 pt-2">
+                      {p.models.filter(m => m.isAvailable).map(m => (
+                        <div key={m.modelId} className="flex justify-between text-xs text-slate-400">
+                          <span>{m.modelName}</span>
+                          <span className="font-mono text-cyan-400">{m.inputPricePerMillion} / {m.outputPricePerMillion} €</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -39,10 +49,30 @@ export default function CalculationDetails() {
               <h4 className="text-sm font-semibold text-purple-400 mb-3">GPU Cloud Providery (Cenníky)</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {GPU_PROVIDERS.map(p => (
-                  <a key={p.id} href={p.pricingUrl} target="_blank" rel="noreferrer" className="flex items-center justify-between p-3 rounded bg-slate-900 border border-slate-800 hover:border-purple-500/50 transition-colors">
-                    <span className="text-sm text-slate-200">{p.flag} {p.name}</span>
-                    <span className="text-xs text-indigo-400">Otvoriť ↗</span>
-                  </a>
+                  <div key={p.id} className="p-3 rounded bg-slate-900 border border-slate-800 flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-slate-200">{p.flag} {p.name}</span>
+                      <a href={p.pricingUrl} target="_blank" rel="noreferrer" className="text-xs text-indigo-400 hover:underline">Zdroj ↗</a>
+                    </div>
+                    <div className="space-y-1 mt-2 border-t border-slate-800 pt-2">
+                      {p.instances.map(inst => {
+                        const isPurchase = inst.pricePerHour === 0 && inst.hardwareCostPerNode;
+                        const priceText = isPurchase ? `${inst.hardwareCostPerNode?.toLocaleString()} €` : `${inst.pricePerHour.toFixed(2)} €/h`;
+                        
+                        return (
+                          <div key={inst.id} className="flex justify-between items-center text-xs text-slate-400 gap-2">
+                            <div className="flex gap-1 items-center truncate">
+                              <span className="truncate" title={inst.name}>{inst.name}</span>
+                              {inst.itemUrl && (
+                                <a href={inst.itemUrl} target="_blank" rel="noreferrer" className="text-indigo-400 hover:underline shrink-0" title="Zobraziť v e-shope">↗</a>
+                              )}
+                            </div>
+                            <span className="font-mono text-purple-400 whitespace-nowrap">{priceText}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -63,15 +93,41 @@ export default function CalculationDetails() {
                   <li><strong>Kvantizácia (Bytes_Per_Param):</strong> FP8 = 1 byte/param, INT4 = 0.5 byte/param. Určuje presnú veľkosť statických váh modelu.</li>
                 </ul>
                 
-                <h5 className="font-semibold text-emerald-500 mb-2 mt-4 border-t border-slate-800 pt-4">Benchmarked TPS_Per_Replica (Priepustnosť na 1 uzol)</h5>
+                <h5 className="font-semibold text-emerald-500 mb-2 mt-4 border-t border-slate-800 pt-4">Hardvérový Výkon (GPU_HARDWARE_SPECS) a Koeficienty</h5>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-800 text-slate-300">
+                      <tr>
+                        <th className="px-3 py-2 rounded-tl">Karta</th>
+                        <th className="px-3 py-2">Bandwidth (GB/s)</th>
+                        <th className="px-3 py-2">Výkon (TFLOPS)</th>
+                        <th className="px-3 py-2 rounded-tr">Výkonnostný koeficient</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800 text-slate-400">
+                      {Object.entries(GPU_HARDWARE_SPECS).map(([gpu, specs]) => {
+                        const base = GPU_HARDWARE_SPECS['H100'];
+                        const ratio = (0.8 * (specs.memoryBandwidthGBs / base.memoryBandwidthGBs)) + (0.2 * (specs.tflops / base.tflops));
+                        return (
+                          <tr key={gpu} className="hover:bg-slate-800/50">
+                            <td className="px-3 py-2 text-slate-200 font-medium">{gpu}</td>
+                            <td className="px-3 py-2 font-mono text-emerald-400">{specs.memoryBandwidthGBs.toLocaleString()}</td>
+                            <td className="px-3 py-2 font-mono text-emerald-400">{specs.tflops.toLocaleString()}</td>
+                            <td className="px-3 py-2 font-mono text-purple-400">{ratio.toFixed(3)}x</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                <h5 className="font-semibold text-cyan-500 mb-2 mt-4 border-t border-slate-800 pt-4">Základná priepustnosť na uzol H100 (Baseline TPS)</h5>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
                     <thead className="bg-slate-800 text-slate-300">
                       <tr>
                         <th className="px-3 py-2 rounded-tl">Model</th>
-                        <th className="px-3 py-2">H100 TPS</th>
-                        <th className="px-3 py-2">H200 TPS</th>
-                        <th className="px-3 py-2 rounded-tr">GB200 TPS</th>
+                        <th className="px-3 py-2 rounded-tr">Base H100 TPS (1 Uzol / 8 kariet)</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800 text-slate-400">
@@ -79,8 +135,6 @@ export default function CalculationDetails() {
                         <tr key={m.id} className="hover:bg-slate-800/50">
                           <td className="px-3 py-2 text-slate-200 font-medium">{m.name}</td>
                           <td className="px-3 py-2 font-mono text-emerald-400">{m.tpsPerReplica.H100 ? m.tpsPerReplica.H100.toLocaleString() : '-'}</td>
-                          <td className="px-3 py-2 font-mono text-emerald-400">{m.tpsPerReplica.H200 ? m.tpsPerReplica.H200.toLocaleString() : '-'}</td>
-                          <td className="px-3 py-2 font-mono text-emerald-400">{m.tpsPerReplica.GB200 ? m.tpsPerReplica.GB200.toLocaleString() : '-'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -92,7 +146,7 @@ export default function CalculationDetails() {
         </details>
 
         {/* Krok 1: TPS */}
-        <details className="glass-card rounded-lg group">
+        <details className="glass-card rounded-lg group" open>
           <summary className="px-6 py-4 cursor-pointer font-semibold text-white flex items-center justify-between hover:bg-white/5 transition-colors">
             <div className="flex items-center gap-3">
               <span className="flex items-center justify-center w-6 h-6 rounded bg-indigo-500/20 text-indigo-400 text-xs font-mono border border-indigo-500/30">1</span>
@@ -112,15 +166,15 @@ export default function CalculationDetails() {
               <p><span className="text-pink-400">Working_Seconds</span> = Days × Hours × 3600</p>
               <p><span className="text-pink-400">Avg_Equivalent_TPS</span> = Equivalent_Output_Tokens / Working_Seconds</p>
               <p className="text-slate-500 pt-2 border-t border-slate-800 mt-2">
-                // Peak TPS zohľadňuje základňu (počet developerov) a dávkové vyťaženie (Multiplier)
+                // Peak TPS zohľadňuje priemernú záťaž a dávkové vyťaženie (Multiplier)
               </p>
-              <p><span className="text-pink-400">Peak_TPS</span> = MAX(Concurrency × 40, Avg_Equivalent_TPS × Peak_Multiplier)</p>
+              <p><span className="text-pink-400">Peak_TPS</span> = Avg_Equivalent_TPS × Peak_Multiplier</p>
             </div>
           </div>
         </details>
 
         {/* Krok 2: VRAM */}
-        <details className="glass-card rounded-lg group">
+        <details className="glass-card rounded-lg group" open>
           <summary className="px-6 py-4 cursor-pointer font-semibold text-white flex items-center justify-between hover:bg-white/5 transition-colors">
             <div className="flex items-center gap-3">
               <span className="flex items-center justify-center w-6 h-6 rounded bg-indigo-500/20 text-indigo-400 text-xs font-mono border border-indigo-500/30">2</span>
@@ -143,7 +197,7 @@ export default function CalculationDetails() {
         </details>
 
         {/* Krok 3: Sizing */}
-        <details className="glass-card rounded-lg group">
+        <details className="glass-card rounded-lg group" open>
           <summary className="px-6 py-4 cursor-pointer font-semibold text-white flex items-center justify-between hover:bg-white/5 transition-colors">
             <div className="flex items-center gap-3">
               <span className="flex items-center justify-center w-6 h-6 rounded bg-indigo-500/20 text-indigo-400 text-xs font-mono border border-indigo-500/30">3</span>
@@ -167,15 +221,15 @@ export default function CalculationDetails() {
                 <li><strong>KV_Cache:</strong> 8x H100 = 640 GB kapacity. Z toho 15% pre KV = <span className="font-mono text-cyan-300">96 GB</span></li>
                 <li><strong>Total_VRAM:</strong> 428 + 96 = <span className="font-mono text-cyan-300">524 GB</span></li>
                 <li><strong>Nodes_For_VRAM:</strong> Uzol 8x H100 má využiteľných 85% (544 GB). Teda <span className="font-mono text-purple-300">524 GB / 544 GB = 1 Uzol</span> (kvôli pamäti)</li>
-                <li><strong>Replicas_Needed:</strong> Pri bežnej záťaži (napr. 30 paralel. používateľov = 1200 Peak_TPS) sa kapacita delí priepustnosťou: <span className="font-mono text-purple-300">ceil(1200 / 3800 TPS) = 1 replika</span>. Kalkulačka však volí <strong>maximum</strong> z paralelnej záťaže a z celkového mesačného <em>ekvivalentného</em> objemu. Ak má používateľ zadaných extrémych 25 miliárd tokenov/mesiac, no 80% z toho sú len Input tokeny (čítanie kontextu je bleskové), systém prepočíta túto masu na Equivalent Output TPS. Odhadovaný Peak_TPS tak dramaticky klesne (napr. na ~14 000 TPS) a namiesto nezmyselných 15 uzlov kalkulačka alokuje rozumné <span className="font-mono text-purple-300">ceil(14000 / 3800) = 4 repliky</span>.</li>
-                <li><strong>Záver:</strong> Na bežnú prevádzku MiniMax M3 (30 programátorov, primeraný objem dát) stačí presne 1 GPU uzol (8x H100). Ak zadáte extrémny "Počet tokenov", systém pridá ďalšie uzly, pričom zohľadňuje obrovskú rýchlosť čítania (Prefill) vs. pomalšie generovanie (Decode).</li>
+                <li><strong>Replicas_Needed:</strong> Kalkulačka volí kapacitu na základe celkového mesačného <em>ekvivalentného</em> objemu. Ak má používateľ zadaných extrémych 25 miliárd tokenov/mesiac, no 80% z toho sú len Input tokeny (čítanie kontextu je bleskové), systém prepočíta túto masu na Equivalent Output TPS. Odhadovaný Peak_TPS tak dramaticky klesne (napr. na ~14 000 TPS) a namiesto nezmyselných 15 uzlov kalkulačka alokuje rozumné <span className="font-mono text-purple-300">ceil(14000 / 3800) = 4 repliky</span>.</li>
+                <li><strong>Záver:</strong> Na bežnú prevádzku MiniMax M3 stačí 1 GPU uzol (8x H100). Ak zadáte extrémny "Počet tokenov", systém pridá ďalšie uzly, pričom zohľadňuje obrovskú rýchlosť čítania (Prefill) vs. pomalšie generovanie (Decode).</li>
               </ul>
             </div>
           </div>
         </details>
 
         {/* Krok 4: Náklady */}
-        <details className="glass-card rounded-lg group">
+        <details className="glass-card rounded-lg group" open>
           <summary className="px-6 py-4 cursor-pointer font-semibold text-white flex items-center justify-between hover:bg-white/5 transition-colors">
             <div className="flex items-center gap-3">
               <span className="flex items-center justify-center w-6 h-6 rounded bg-indigo-500/20 text-indigo-400 text-xs font-mono border border-indigo-500/30">4</span>
@@ -197,7 +251,7 @@ export default function CalculationDetails() {
         </details>
 
         {/* Krok 5: On-Premise Náklady */}
-        <details className="glass-card rounded-lg group">
+        <details className="glass-card rounded-lg group" open>
           <summary className="px-6 py-4 cursor-pointer font-semibold text-white flex items-center justify-between hover:bg-white/5 transition-colors">
             <div className="flex items-center gap-3">
               <span className="flex items-center justify-center w-6 h-6 rounded bg-emerald-500/20 text-emerald-400 text-xs font-mono border border-emerald-500/30">5</span>

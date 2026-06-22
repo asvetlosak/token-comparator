@@ -117,10 +117,10 @@ export default function MatrixResults({ matrix, workload, inputs }: MatrixResult
                               <br/>
                               <p>Working_Seconds = {inputs.workDaysPerMonth} × {inputs.hoursPerDay} × 3600 = <span className="text-pink-400">{formatNumber(workload.workingSecondsPerMonth)}</span></p>
                               <p>Avg_Equivalent_TPS = {formatNumber(workload.equivalentOutputTokens)} / {formatNumber(workload.workingSecondsPerMonth)} = <span className="text-pink-400">{Math.ceil(workload.avgEquivalentTPS).toLocaleString()}</span></p>
-                              <p>Peak_TPS = ({Math.ceil(workload.avgEquivalentTPS).toLocaleString()} × {inputs.peakMultiplier}) + ({inputs.concurrentDevelopers} × 50) = <span className="text-pink-400">{Math.ceil(workload.peakTPS).toLocaleString()}</span></p>
+                              <p>Peak_TPS = {Math.ceil(workload.avgEquivalentTPS).toLocaleString()} × {inputs.peakMultiplier} = <span className="text-pink-400">{Math.ceil(workload.peakTPS).toLocaleString()}</span></p>
                               <br/>
                               <p>Weights_VRAM_GB = <span className="text-cyan-400">{gpu.modelWeightVRAM_GB.toFixed(1)} GB</span></p>
-                              <p>KV_Cache_VRAM = {gpu.instance.gpuCount} × {gpu.instance.vramPerGPU} × 0.15 = <span className="text-cyan-400">{gpu.totalKVCacheVRAM_GB.toFixed(1)} GB</span></p>
+                              <p>KV_Cache_VRAM = presný výpočet (kontext {inputs.avgContextLength}) = <span className="text-cyan-400">{gpu.totalKVCacheVRAM_GB.toFixed(1)} GB</span></p>
                               <p>Total_VRAM = {gpu.modelWeightVRAM_GB.toFixed(1)} + {gpu.totalKVCacheVRAM_GB.toFixed(1)} = <span className="text-cyan-400">{gpu.totalVRAM_GB.toFixed(1)} GB</span></p>
                               <p>Nodes_For_VRAM = ceil({gpu.totalVRAM_GB.toFixed(1)} / ({gpu.instance.gpuCount * gpu.instance.vramPerGPU} × 0.85)) = <span className="text-purple-400">{gpu.nodesForModel}</span></p>
                               <br/>
@@ -176,7 +176,12 @@ export default function MatrixResults({ matrix, workload, inputs }: MatrixResult
                           <details className="mt-4 border-t border-emerald-500/30 pt-3 group">
                             <summary className="cursor-pointer text-[11px] font-semibold text-emerald-400 hover:text-emerald-300">Zobraziť výpočty (Debug) ▼</summary>
                             <div className="space-y-2 font-mono text-[10px] text-slate-400 mt-3 bg-slate-900/50 p-3 rounded">
+                              <p>Total_VRAM = {gpu.modelWeightVRAM_GB.toFixed(1)} GB (Weights) + {gpu.totalKVCacheVRAM_GB.toFixed(1)} GB (KV) = <span className="text-emerald-400">{gpu.totalVRAM_GB.toFixed(1)} GB</span></p>
                               <p>Nodes_For_VRAM = ceil({gpu.totalVRAM_GB.toFixed(1)} / ({gpu.instance.gpuCount * gpu.instance.vramPerGPU} × 0.85)) = <span className="text-emerald-400">{gpu.nodesForModel}</span></p>
+                              <br/>
+                              <p>Base_H100_TPS = {model.tpsPerReplica['H100']} (pre celý uzol)</p>
+                              <p>HW_Perf_Multiplier = <span className="text-emerald-400">{gpu.perfMultiplier.toFixed(3)}x</span> (80% BW, 20% TFLOPS)</p>
+                              <p>Instance_TPS = {model.tpsPerReplica['H100']} × {gpu.perfMultiplier.toFixed(3)} = <span className="text-emerald-400">{gpu.tpsPerReplica}</span></p>
                               <p>Replicas_Needed = ceil({Math.ceil(workload.peakTPS).toLocaleString()} / {gpu.tpsPerReplica}) = <span className="text-emerald-400">{gpu.replicasNeeded}</span></p>
                               <p>Total_Nodes = {gpu.nodesForModel} × {gpu.replicasNeeded} = <span className="text-emerald-400">{gpu.totalNodes}</span></p>
                               <br/>

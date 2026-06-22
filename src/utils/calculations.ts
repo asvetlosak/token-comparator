@@ -17,6 +17,7 @@ import {
   type GPUType,
   type Quantization,
   BYTES_PER_PARAM,
+  GPU_HARDWARE_SPECS,
 } from '../data/constants';
 
 // ---------------------------------------------------------------------------
@@ -24,7 +25,7 @@ import {
 // ---------------------------------------------------------------------------
 export interface MatrixInputs {
   totalMonthlyTokensM: number;
-  concurrentDevelopers: number;
+
   inputRatio: number;
   workDaysPerMonth: number;
   hoursPerDay: number;
@@ -49,7 +50,7 @@ export interface WorkloadResults {
   equivalentOutputTokens: number;
   avgEquivalentTPS: number;
   peakTPS: number;
-  estimatedConcurrency: number;
+
 }
 
 // ---------------------------------------------------------------------------
@@ -72,6 +73,7 @@ export interface GPUResult {
   hardwareMonthly?: number;
   powerMonthly?: number;
   adminSalary?: number;
+  perfMultiplier: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -119,11 +121,8 @@ export function calculateWorkload(inputs: MatrixInputs): WorkloadResults {
   const equivalentOutputTokens = totalOutputTokens + (totalInputTokens / 10);
   const avgEquivalentTPS = equivalentOutputTokens / workingSecondsPerMonth;
 
-  const estimatedConcurrency = inputs.concurrentDevelopers;
-  
-  // Peak TPS zohľadňuje priemernú záťaž so špičkovým násobiteľom (objemová zložka),
-  // ku ktorej sa pripočítava paralelná zložka: každý paralelný developer vyžaduje rezervu napr. 50 TPS
-  const peakTPS = (avgEquivalentTPS * inputs.peakMultiplier) + (estimatedConcurrency * 50);
+  // Peak TPS zohľadňuje priemernú záťaž so špičkovým násobiteľom
+  const peakTPS = avgEquivalentTPS * inputs.peakMultiplier;
 
   return {
     totalMonthlyTokens,
@@ -134,7 +133,6 @@ export function calculateWorkload(inputs: MatrixInputs): WorkloadResults {
     equivalentOutputTokens,
     avgEquivalentTPS,
     peakTPS,
-    estimatedConcurrency,
   };
 }
 
@@ -153,24 +151,40 @@ function calculateGPUInstance(
   // VRAM model weights
   const modelWeightVRAM_GB = (model.totalParams * 1e9 * bytesPerParam) / (1024 ** 3);
 
-  // VRAM KV cache - fixne alokujeme 15% z celkovej teoretickej kapacity GPU uzla
-  const instanceVramTotal = instance.gpuCount * instance.vramPerGPU;
-  const totalKVCacheVRAM_GB = instanceVramTotal * 0.15;
-  const kvCachePerRequest_GB = 0;
+  // TPS a Overhead pomocou dynamického výpočtu výkonu
+  const baseTps = model.tpsPerReplica['H100'];
+  if (!baseTps) return null; // Ak nemáme base TPS pre H100, nevieme vypočítať iné
 
-  // Total VRAM
+  const baselineSpecs = GPU_HARDWARE_SPECS['H100'];
+  const instanceSpecs = GPU_HARDWARE_SPECS[instance.gpuType];
+
+  // Výkonnostný koeficient: 80% pamäťová priepustnosť, 20% surový výkon (TFLOPS)
+  const bandwidthRatio = instanceSpecs.memoryBandwidthGBs / baselineSpecs.memoryBandwidthGBs;
+  const tflopsRatio = instanceSpecs.tflops / baselineSpecs.tflops;
+  const perfMultiplier = (0.8 * bandwidthRatio) + (0.2 * tflopsRatio);
+
+  const tpsPerReplica = Math.round(baseTps * perfMultiplier);
+  const replicasNeeded = Math.max(1, Math.ceil(workload.peakTPS / tpsPerReplica));
+
+  // VÝPOČET KV CACHE
+  // KV Cache na token = 2 (Key, Value) * numLayers * numKVHeads * headDim * bytesPerParam
+  const kvCachePerTokenBytes = 2 * model.numLayers * model.numKVHeads * model.headDim * bytesPerParam;
+  const kvCachePerRequest_GB = (kvCachePerTokenBytes * inputs.avgContextLength) / (1024 ** 3);
+  
+  // Odhad concurrency: Predpokladáme, že jedna replika pri jej TPS generuje priemerne rýchlosťou 20 tok/sec na request.
+  const replicaConcurrency = Math.max(1, Math.ceil(tpsPerReplica / 20));
+  
+  const multiplier = model.kvCacheMultiplier || 1.0;
+  const totalKVCacheVRAM_GB = replicaConcurrency * kvCachePerRequest_GB * multiplier;
+
+  // Total VRAM pre JEDNU repliku
   const totalVRAM_GB = modelWeightVRAM_GB + totalKVCacheVRAM_GB;
 
   // Sizing
   const vramPerNode_GB = instance.gpuCount * instance.vramPerGPU;
+  // Nechávame 15% rezervu na CUDA context a aktivácie (0.85)
   const nodesForModel = Math.max(1, Math.ceil(totalVRAM_GB / (vramPerNode_GB * 0.85)));
 
-  // TPS a Overhead
-  const tpsPerReplicaRaw = model.tpsPerReplica[instance.gpuType];
-  if (!tpsPerReplicaRaw) return null; 
-  
-  const tpsPerReplica = tpsPerReplicaRaw;
-  const replicasNeeded = Math.max(1, Math.ceil(workload.peakTPS / tpsPerReplica));
   const totalNodes = nodesForModel * replicasNeeded;
   const totalGPUs = totalNodes * instance.gpuCount;
 
@@ -208,7 +222,8 @@ function calculateGPUInstance(
     selfHostedTotal,
     hardwareMonthly,
     powerMonthly,
-    adminSalary
+    adminSalary,
+    perfMultiplier,
   };
 }
 

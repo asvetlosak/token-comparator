@@ -1,8 +1,6 @@
 import { DEFAULTS } from '../data/constants';
 
 interface InputPanelProps {
-  concurrentDevelopers: number;
-  setConcurrentDevelopers: (v: number) => void;
   totalMonthlyTokensM: number;
   setTotalMonthlyTokensM: (v: number) => void;
   inputRatio: number;
@@ -24,8 +22,6 @@ interface InputPanelProps {
 }
 
 export default function InputPanel({
-  concurrentDevelopers,
-  setConcurrentDevelopers,
   totalMonthlyTokensM,
   setTotalMonthlyTokensM,
   inputRatio,
@@ -72,22 +68,24 @@ export default function InputPanel({
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm text-slate-300">
-            <label>Počet developerov paralelne</label>
+            <label>Peak multiplier</label>
             <input 
               type="number" 
-              value={concurrentDevelopers} 
-              onChange={(e) => setConcurrentDevelopers(Number(e.target.value))}
+              step="0.1"
+              value={peakMultiplier} 
+              onChange={(e) => setPeakMultiplier(Number(e.target.value))}
               className="w-20 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-right font-mono text-indigo-400"
             />
           </div>
           <input 
             type="range" 
-            min="1" max="500" 
-            value={concurrentDevelopers} 
-            onChange={(e) => setConcurrentDevelopers(Number(e.target.value))}
+            min="1" max="10" step="0.1"
+            value={peakMultiplier} 
+            onChange={(e) => setPeakMultiplier(Number(e.target.value))}
             className="w-full accent-indigo-500"
           />
         </div>
+
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm text-slate-300">
@@ -146,22 +144,7 @@ export default function InputPanel({
           />
         </div>
 
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm text-slate-300">
-            <label>Peak multiplier</label>
-            <input 
-              type="number" 
-              step="0.1"
-              value={peakMultiplier} 
-              onChange={(e) => setPeakMultiplier(Number(e.target.value))}
-              className="w-20 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-right font-mono text-indigo-400"
-              disabled
-            />
-          </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Peak TPS je teraz priamo odvodený z počtu paralelných developerov (Peak Multiplier nevyužitý).
-          </p>
-        </div>
+
       </div>
 
       {/* Sekcia 3: Dodatočné náklady */}

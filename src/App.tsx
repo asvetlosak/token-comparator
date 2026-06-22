@@ -8,7 +8,6 @@ import { DEFAULTS } from './data/constants';
 import { LayoutGrid, Cpu, TrendingUp, HelpCircle, AlertTriangle } from 'lucide-react';
 
 export default function App() {
-  const [concurrentDevelopers, setConcurrentDevelopers] = useState(DEFAULTS.concurrentDevelopers);
   const [totalMonthlyTokensM, setTotalMonthlyTokensM] = useState(DEFAULTS.totalMonthlyTokensM);
   const [inputRatio, setInputRatio] = useState(DEFAULTS.inputRatio);
   const [workDays, setWorkDays] = useState(DEFAULTS.workDaysPerMonth);
@@ -22,7 +21,6 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'matrix' | 'methodology' | 'risks'>('matrix');
 
   const matrixInputs: MatrixInputs = useMemo(() => ({
-    concurrentDevelopers,
     totalMonthlyTokensM,
     inputRatio,
     workDaysPerMonth: workDays,
@@ -34,7 +32,7 @@ export default function App() {
     powerCostPerNodePerMonth,
     avgContextLength: DEFAULTS.avgContextLength,
     quantization: DEFAULTS.quantization,
-  }), [concurrentDevelopers, totalMonthlyTokensM, inputRatio, workDays, hoursPerDay, peakMultiplier, includeAdminSalary, adminSalaryPerMonth, amortizationMonths, powerCostPerNodePerMonth]);
+  }), [totalMonthlyTokensM, inputRatio, workDays, hoursPerDay, peakMultiplier, includeAdminSalary, adminSalaryPerMonth, amortizationMonths, powerCostPerNodePerMonth]);
 
   const { workload, matrix } = useMemo(() => calculateMatrix(matrixInputs), [matrixInputs]);
 
@@ -42,19 +40,19 @@ export default function App() {
     <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-indigo-500/30">
       <div className="max-w-[1600px] mx-auto px-4 py-8">
         <header className="mb-8">
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400">
-            EU AI Infrastructure TCO Comparator
+          <h1 className="text-3xl font-extrabold flex items-center gap-3">
+            <span>🇪🇺</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400">EU AI Infrastructure TCO Comparator</span>
+            <span className="text-2xl">🤖 🖥️</span>
           </h1>
           <p className="text-slate-400 mt-2 text-sm max-w-3xl">
-            Interaktívna maticová kalkulačka na porovnanie celkových nákladov (TCO) na prevádzkovanie Cloud Server klastra vs. využívanie API pre top Open-Weight modely v Európe.
+            Interaktívna maticová kalkulačka na porovnanie celkových nákladov (TCO) medzi vlastnou serverovňou (On-Premise), prenájmom Cloud Server klastra a využívaním managed API pre top Open-Weight modely v Európe.
           </p>
         </header>
 
         <div className="flex flex-col xl:flex-row gap-8 items-start">
           <aside className="w-full xl:w-80 shrink-0 sticky top-4 xl:top-8 max-h-[calc(100vh-2rem)] overflow-y-auto pr-1">
             <InputPanel
-              concurrentDevelopers={concurrentDevelopers}
-              setConcurrentDevelopers={setConcurrentDevelopers}
               totalMonthlyTokensM={totalMonthlyTokensM}
               setTotalMonthlyTokensM={setTotalMonthlyTokensM}
               inputRatio={inputRatio}

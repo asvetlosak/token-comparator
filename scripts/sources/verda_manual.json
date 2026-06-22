@@ -1,0 +1,47 @@
+{
+  "_comment": "Manuálne udržiavané ceny Verda GPU cloudu (EU/Finland).",
+  "_reason": "Verda nemá verejný pricing page ani machine-readable API. Ceny overené priamym kontaktom/obchodnou ponukou.",
+  "_rules": [
+    "Tento súbor NIKDY neprepíše update_constants.py",
+    "Aktualizovať manuálne po overení cien na verda.com alebo priamym kontaktom",
+    "Dátum overenia je povinný"
+  ],
+  "provider_id": "verda",
+  "last_verified": "2026-06-22",
+  "source_url": "https://verda.com",
+  "contact_note": "Ceny overené priamym dopytom — Verda nemá verejný cenník",
+  "instances": [
+    {
+      "id": "dc-h100-1x",
+      "name": "1x H100 SXM5 (EU/Finland)",
+      "gpu_type": "H100",
+      "gpu_count": 1,
+      "vram_per_gpu": 80,
+      "price_per_hour_eur": 3.25
+    },
+    {
+      "id": "dc-h100-2x",
+      "name": "2x H100 SXM5 (EU/Finland)",
+      "gpu_type": "H100",
+      "gpu_count": 2,
+      "vram_per_gpu": 80,
+      "price_per_hour_eur": 6.50
+    },
+    {
+      "id": "dc-h100-4x",
+      "name": "4x H100 SXM5 (EU/Finland)",
+      "gpu_type": "H100",
+      "gpu_count": 4,
+      "vram_per_gpu": 80,
+      "price_per_hour_eur": 13.00
+    },
+    {
+      "id": "dc-h100",
+      "name": "8x H100 SXM5 (EU/Finland)",
+      "gpu_type": "H100",
+      "gpu_count": 8,
+      "vram_per_gpu": 80,
+      "price_per_hour_eur": 26.00
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "_comment": "Manuálne udržiavané TPS benchmarky pre GPU typy.",
+  "_rules": [
+    "Tieto hodnoty NIKDY neprepíše update_constants.py",
+    "Každá hodnota musí mať zdroj URL a dátum overenia",
+    "Ak sú hodnoty staršie ako 30 dní, update_constants.py vypíše varovanie",
+    "Zdroje: Artificial Analysis (artificialanalysis.ai), komunitné benchmarky"
+  ],
+  "last_verified": "2026-06-22",
+  "models": {
+    "deepseek-v4": {
+      "name": "DeepSeek Pro v4 (1.6T MoE)",
+      "tpsPerReplica": {
+        "H100": {
+          "value": 2800,
+          "source": "https://artificialanalysis.ai/models/deepseek-v3-0324",
+          "note": "Priemer pre 8x H100 SXM5, vLLM FP8, dávkové spracovanie. V4 = architektúrálne podobný V3."
+        },
+        "H200": {
+          "value": 3500,
+          "source": "https://artificialanalysis.ai/models/deepseek-v3-0324",
+          "note": "Odhad na základe H100 benchmarkov × H200/H100 výkonnostný pomer (~1.25x)"
+        },
+        "GB200": {
+          "value": 4800,
+          "source": "https://developer.nvidia.com/blog/nvidia-gb200-nvl72",
+          "note": "Odhad NVIDIA GB200 × 1.7x voči H100 pre large MoE modely"
+        }
+      }
+    },
+    "minimax-m3": {
+      "name": "MiniMax M3 (428B MoE)",
+      "tpsPerReplica": {
+        "H100": {
+          "value": 3500,
+          "source": "https://artificialanalysis.ai",
+          "note": "Odhad pre 428B MoE model, aktívnych ~23B parametrov, 8x H100 SXM5"
+        },
+        "H200": {
+          "value": 4200,
+          "source": "https://artificialanalysis.ai",
+          "note": "Odhad × 1.2x voči H100"
+        },
+        "GB200": {
+          "value": 5800,
+          "source": "https://developer.nvidia.com/blog/nvidia-gb200-nvl72",
+          "note": "Odhad × 1.65x voči H100"
+        }
+      }
+    },
+    "glm-5.2": {
+      "name": "GLM 5.2 (744B MoE)",
+      "tpsPerReplica": {
+        "H100": {
+          "value": 3200,
+          "source": "https://artificialanalysis.ai",
+          "note": "Odhad pre 744B MoE, aktívnych ~40B parametrov, 8x H100 SXM5"
+        },
+        "H200": {
+          "value": 4000,
+          "source": "https://artificialanalysis.ai",
+          "note": "Odhad × 1.25x voči H100"
+        },
+        "GB200": {
+          "value": 5200,
+          "source": "https://developer.nvidia.com/blog/nvidia-gb200-nvl72",
+          "note": "Odhad × 1.63x voči H100"
+        }
+      }
+    },
+    "qwen-3.6": {
+      "name": "Qwen 3.6 (35B MoE)",
+      "tpsPerReplica": {
+        "H100": {
+          "value": 5500,
+          "source": "https://artificialanalysis.ai/models/qwen3-235b-a22b",
+          "note": "Benchmark pre Qwen3 35B MoE, aktívnych ~3B parametrov, 1x H100"
+        },
+        "H200": {
+          "value": 7000,
+          "source": "https://artificialanalysis.ai",
+          "note": "Odhad × 1.27x voči H100"
+        },
+        "GB200": {
+          "value": 9500,
+          "source": "https://developer.nvidia.com/blog/nvidia-gb200-nvl72",
+          "note": "Odhad × 1.73x voči H100"
+        }
+      }
+    }
+  }
+}
