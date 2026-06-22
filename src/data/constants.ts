@@ -330,7 +330,7 @@ export const DEFAULTS = {
   peakMultiplier: 1.5,
   includeAdminSalary: false,
   adminSalaryPerMonth: 10000,
-  amortizationMonths: 12,
+  amortizationMonths: 24,
   powerCostPerNodePerMonth: 1500,
   avgContextLength: 8192,
   quantization: 'FP8' as Quantization,

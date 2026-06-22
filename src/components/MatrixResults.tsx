@@ -115,27 +115,16 @@ export default function MatrixResults({ matrix, workload, inputs }: MatrixResult
                               <p>Total_Output = {formatNumber(inputs.totalMonthlyTokensM * 1_000_000)} × {(1 - inputs.inputRatio).toFixed(2)} = <span className="text-pink-400">{formatNumber(workload.totalOutputTokens)}</span></p>
                               <p>Equivalent_Output_Tokens = {formatNumber(workload.totalOutputTokens)} + ({formatNumber(workload.totalInputTokens)} / 10) = <span className="text-pink-400">{formatNumber(workload.equivalentOutputTokens)}</span></p>
                               <br/>
-                              {gpu.effectivePeakTPS ? (
-                                <>
-                                  <p className="text-emerald-400 mt-2">// On-Premise beží 24/7, záťaž je rozložená na celý mesiac (730h):</p>
-                                  <p>Working_Seconds = 30.416 × 24 × 3600 = <span className="text-pink-400">2,627,942</span></p>
-                                  <p>Avg_Equivalent_TPS = {formatNumber(workload.equivalentOutputTokens)} / 2,627,942 = <span className="text-pink-400">{Math.ceil(workload.equivalentOutputTokens / 2627942).toLocaleString()}</span></p>
-                                  <p>Peak_TPS (24/7) = MAX({inputs.concurrentDevelopers} × 40, {Math.ceil(workload.equivalentOutputTokens / 2627942).toLocaleString()} × {inputs.peakMultiplier}) = <span className="text-pink-400">{Math.ceil(gpu.effectivePeakTPS).toLocaleString()}</span></p>
-                                </>
-                              ) : (
-                                <>
-                                  <p>Working_Seconds = {inputs.workDaysPerMonth} × {inputs.hoursPerDay} × 3600 = <span className="text-pink-400">{formatNumber(workload.workingSecondsPerMonth)}</span></p>
-                                  <p>Avg_Equivalent_TPS = {formatNumber(workload.equivalentOutputTokens)} / {formatNumber(workload.workingSecondsPerMonth)} = <span className="text-pink-400">{Math.ceil(workload.avgEquivalentTPS).toLocaleString()}</span></p>
-                                  <p>Peak_TPS = MAX({inputs.concurrentDevelopers} × 40, {Math.ceil(workload.avgEquivalentTPS).toLocaleString()} × {inputs.peakMultiplier}) = <span className="text-pink-400">{Math.ceil(workload.peakTPS).toLocaleString()}</span></p>
-                                </>
-                              )}
+                              <p>Working_Seconds = {inputs.workDaysPerMonth} × {inputs.hoursPerDay} × 3600 = <span className="text-pink-400">{formatNumber(workload.workingSecondsPerMonth)}</span></p>
+                              <p>Avg_Equivalent_TPS = {formatNumber(workload.equivalentOutputTokens)} / {formatNumber(workload.workingSecondsPerMonth)} = <span className="text-pink-400">{Math.ceil(workload.avgEquivalentTPS).toLocaleString()}</span></p>
+                              <p>Peak_TPS = ({Math.ceil(workload.avgEquivalentTPS).toLocaleString()} × {inputs.peakMultiplier}) + ({inputs.concurrentDevelopers} × 50) = <span className="text-pink-400">{Math.ceil(workload.peakTPS).toLocaleString()}</span></p>
                               <br/>
                               <p>Weights_VRAM_GB = <span className="text-cyan-400">{gpu.modelWeightVRAM_GB.toFixed(1)} GB</span></p>
                               <p>KV_Cache_VRAM = {gpu.instance.gpuCount} × {gpu.instance.vramPerGPU} × 0.15 = <span className="text-cyan-400">{gpu.totalKVCacheVRAM_GB.toFixed(1)} GB</span></p>
                               <p>Total_VRAM = {gpu.modelWeightVRAM_GB.toFixed(1)} + {gpu.totalKVCacheVRAM_GB.toFixed(1)} = <span className="text-cyan-400">{gpu.totalVRAM_GB.toFixed(1)} GB</span></p>
                               <p>Nodes_For_VRAM = ceil({gpu.totalVRAM_GB.toFixed(1)} / ({gpu.instance.gpuCount * gpu.instance.vramPerGPU} × 0.85)) = <span className="text-purple-400">{gpu.nodesForModel}</span></p>
                               <br/>
-                              <p>Replicas_Needed = ceil({Math.ceil(gpu.effectivePeakTPS || workload.peakTPS).toLocaleString()} / {gpu.tpsPerReplica}) = <span className="text-purple-400">{gpu.replicasNeeded}</span></p>
+                              <p>Replicas_Needed = ceil({Math.ceil(workload.peakTPS).toLocaleString()} / {gpu.tpsPerReplica}) = <span className="text-purple-400">{gpu.replicasNeeded}</span></p>
                               <p>Total_Nodes = {gpu.nodesForModel} × {gpu.replicasNeeded} = <span className="text-emerald-400">{gpu.totalNodes}</span></p>
                               <br/>
                               {gpu.provider.id !== 'on-premise' && (

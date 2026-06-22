@@ -65,7 +65,6 @@ export interface GPUResult {
   vramPerNode_GB: number;
   nodesForModel: number;
   tpsPerReplica: number;
-  effectivePeakTPS?: number;
   replicasNeeded: number;
   totalNodes: number;
   totalGPUs: number;
@@ -122,9 +121,9 @@ export function calculateWorkload(inputs: MatrixInputs): WorkloadResults {
 
   const estimatedConcurrency = inputs.concurrentDevelopers;
   
-  // Peak TPS zohľadňuje nielen počet paralelných developerov (baseline output),
-  // ale aj celkový ekvivalentný objem práce cez peak multiplier
-  const peakTPS = Math.max(estimatedConcurrency * 40, avgEquivalentTPS * inputs.peakMultiplier);
+  // Peak TPS zohľadňuje priemernú záťaž so špičkovým násobiteľom (objemová zložka),
+  // ku ktorej sa pripočítava paralelná zložka: každý paralelný developer vyžaduje rezervu napr. 50 TPS
+  const peakTPS = (avgEquivalentTPS * inputs.peakMultiplier) + (estimatedConcurrency * 50);
 
   return {
     totalMonthlyTokens,
@@ -171,17 +170,7 @@ function calculateGPUInstance(
   if (!tpsPerReplicaRaw) return null; 
   
   const tpsPerReplica = tpsPerReplicaRaw;
-  
-  let effectivePeakTPS = workload.peakTPS;
-  if (provider.id === 'on-premise') {
-    // Vlastná serverovňa beží vždy 24/7. Záťaž sa preto rozloží na celý mesiac (30.41 dňa = 730h)
-    // namiesto užívateľom zadaných pracovných hodín.
-    const onPremiseWorkingSeconds = 30.416 * 24 * 3600;
-    const onPremiseAvgEquivalentTPS = workload.equivalentOutputTokens / onPremiseWorkingSeconds;
-    effectivePeakTPS = Math.max(inputs.concurrentDevelopers * 40, onPremiseAvgEquivalentTPS * inputs.peakMultiplier);
-  }
-
-  const replicasNeeded = Math.max(1, Math.ceil(effectivePeakTPS / tpsPerReplica));
+  const replicasNeeded = Math.max(1, Math.ceil(workload.peakTPS / tpsPerReplica));
   const totalNodes = nodesForModel * replicasNeeded;
   const totalGPUs = totalNodes * instance.gpuCount;
 
@@ -213,7 +202,6 @@ function calculateGPUInstance(
     vramPerNode_GB,
     nodesForModel,
     tpsPerReplica,
-    effectivePeakTPS,
     replicasNeeded,
     totalNodes,
     totalGPUs,
